@@ -9,7 +9,7 @@ function App() {
   const [todo, setTodo] = useState('');
   const localData = JSON.parse(localStorage.getItem('todos'));
   const [todolist, setTodoList] = useState(localData || []);
-  const [checked, setChecked] = useState(false);
+  const [isChecked, setChecked] = useState(false);
 
   const onChange = e => {
     setTodo(e.target.value);
@@ -21,7 +21,7 @@ function App() {
     if (todolist.length >= 10) {
       return alert('오늘의 TodoList 한도를 초과했습니다.');
     } else {
-      setTodoList(currentArray => [{ id: Math.random(), todo: todo, checked: false }, ...currentArray]);
+      setTodoList(currentArray => [{ id: Math.random(), todo: todo, isChecked: isChecked }, ...currentArray]);
     }
     setTodo('');
   };
@@ -30,17 +30,17 @@ function App() {
     setTodoList(todolist.filter(item => item.id !== idx));
   };
 
-  const onChecked = (idx, itemIdx) => {
-    if (todolist[idx].id == itemIdx) {
-      // setChecked(!checked);
-      // setTodoList(currentArray => [
-      //   { id: todolist[idx].id, todo: todolist[idx].todo, checked: !checked },
-      //   ...currentArray,
-      // ]);
-      setTodoList({ id: todolist[idx].id, todo: todolist[idx].todo, checked: !checked });
-      console.log('onChecked');
-    }
-    // console.log('onChecked');
+  const onClick = idx => {
+    setChecked(!isChecked);
+    // 체크표시할 인덱스를 찾는다.
+    const findIndex = todolist.findIndex(item => item.id === idx);
+    const copiedTodolist = [...todolist];
+    copiedTodolist[findIndex].isChecked = !isChecked;
+    setTodoList(copiedTodolist);
+  };
+
+  const onChecked = isChecked => {
+    return isChecked ? 'checked' : '';
   };
 
   useEffect(() => {
@@ -71,12 +71,13 @@ function App() {
         </Form>
         <ul>
           {todolist &&
-            todolist.map((item, idx) => (
+            todolist.map(item => (
               <TodoItem
                 item={item.todo}
                 key={item.id}
                 onDelete={() => onDelete(item.id)}
-                onChecked={() => onChecked(idx, item.id)}
+                onClick={() => onClick(item.id)}
+                isChecked={onChecked(item.isChecked)}
               />
             ))}
         </ul>

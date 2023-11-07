@@ -2,10 +2,10 @@ import styled from 'styled-components';
 import { Form } from 'react-bootstrap';
 import { useState } from 'react';
 
-function Item({ item, onDelete, onChecked }) {
+function Item({ item, onDelete, onClick, isChecked }) {
   return (
     <Li>
-      <Form.Check type='checkbox' onClick={onChecked} />
+      <Form.Check type='checkbox' onClick={onClick} checked={isChecked} />
       {item} <button onClick={onDelete}>X</button>
     </Li>
   );
