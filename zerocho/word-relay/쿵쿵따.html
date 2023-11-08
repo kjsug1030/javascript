@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>쿵쿵따</title>
+  </head>
+  <body>
+    <h1>이름하여 쿵쿵따</h1>
+    <div>
+      <span>순서: </span>
+      <span class="order">1</span>
+      <span>번째 유저</span>
+      <span>&nbsp;&nbsp;접속유저수: </span>
+      <span class="user-number"></span>
+    </div>
+    <div>
+      <span>단어: </span>
+      <span class="word"></span>
+    </div>
+    <div>
+      <input type="text" />
+      <button id="btn">입력</button>
+    </div>
+    <div><span class="error"></span></div>
+  </body>
+  <script>
+    const users = parseInt(prompt("몇 명이 참가하시나요?", 2));
+    const $order = document.querySelector(".order");
+    const $userNumber = document.querySelector(".user-number");
+    const $error = document.querySelector(".error");
+    const $word = document.querySelector(".word");
+    const $input = document.querySelector("input");
+    const $button = document.querySelector("#btn");
+
+    if (!users) {
+      alert("에러가 발생했습니다. 처음부터 다시 진행해주세요");
+      location.replace(location.href);
+    } else {
+      $userNumber.textContent = users;
+    }
+
+    $input.focus();
+
+    let word;
+    let newWord;
+
+    const onInputCheck = () => {
+      if (
+        !word ||
+        (word[word.length - 1] === newWord[0] && newWord.length === 3)
+      ) {
+        word = newWord;
+        $word.textContent = word;
+        console.log("입력");
+        console.log("newWord: " + newWord);
+        let orderNumber = Number($order.textContent);
+        console.log(orderNumber);
+        if (orderNumber < users) {
+          $order.textContent = orderNumber + 1;
+        } else {
+          $order.textContent = 1;
+        }
+      } else {
+        $error.textContent = "에러가 발생했습니다. 다시 입력해주세요.";
+        console.log("newWord: " + newWord);
+        setTimeout(() => {
+          $error.textContent = "";
+        }, 2000);
+      }
+      $input.value = "";
+      $input.focus();
+    };
+
+    const onInput = (e) => {
+      console.log("newWord는 " + e.target.value);
+      newWord = e.target.value;
+    };
+
+    $button.addEventListener("click", onInputCheck);
+    $input.addEventListener("input", onInput);
+    $input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        onInputCheck();
+      }
+    });
+  </script>
+</html>

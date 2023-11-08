@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끝말잇기</title>
+    <style></style>
+  </head>
+  <body>
+    <div><span id="order">1</span>번째 순서</div>
+    <div><span id="flow"></span>제시어: <span id="word"></span></div>
+    <input type="text" autofocus />
+    <button>입력</button>
+    <div id="error"></div>
+    <script>
+      // 참여인원수 입력
+      const number = parseInt(prompt("몇명이 참가하나요?"), 10);
+
+      // 참여의사 확인
+      const yesOrno = confirm("참가하는것이 맞나요?");
+
+      // 게임시작
+      const $flow = document.querySelector("#flow");
+      const $order = document.querySelector("#order");
+      let pNum = parseInt($order.textContent); // 인원수
+
+      // 참여인원수 표시
+      if (number > 0) {
+        $flow.innerHTML = "게임이 시작되었습니다. 제시어를 입력해주세요<br/>";
+      } else {
+        $order.innerHTML = `참가자미정`;
+      }
+      // 끝말잇기 단어종합
+      const words = [];
+
+      // 단어입력
+      // $는 자바스크립트 값이 아니라 태그를 선택했다는 의미
+      const $input = document.querySelector("input");
+      const $word = document.querySelector("#word");
+      const $button = document.querySelector("button");
+
+      let word; // 제시어
+
+      let newWord; // 새로 입력한 단어
+
+      const onclickButton = () => {
+        $input.focus();
+        if (!word) {
+          // 제시어가 비어있는가?
+          word = newWord;
+          $word.textContent = word;
+          $flow.textContent = "첫번째 ";
+          words.push(newWord);
+        } else {
+          // 올바른가 올바르지 않은가 (제시어의 끝문자와 입력단어의 첫글자가 같으면 OK)
+          if (word[word.length - 1] == newWord[0]) {
+            $word.textContent = newWord;
+            $flow.textContent = "";
+            words.push(newWord);
+          } else {
+            // 올바르지 않은 단어를 입력했을 때 에러메서지 출력
+            document.querySelector("#error").innerText =
+              "단어가 올바르지 않습니다 다시 입력하시오";
+          }
+        }
+        if (pNum + 1 > number) {
+          $order.innerText = 1;
+        } else {
+          $order.innerText = pNum += 1;
+        }
+        $input.value = "";
+        console.log(words);
+      };
+
+      const onInput = (e) => {
+        newWord = e.target.value;
+
+        // input에 포커스가 잡혔을 때 error 메세지를 삭제한다
+        $input.onfocus = () => {
+          document.querySelector("#error").innerText = "";
+        };
+      };
+
+      // 버튼클릭
+      $button.addEventListener("click", onclickButton);
+      $input.addEventListener("input", onInput);
+      $input.addEventListener("keydown", (e) => {
+        if (e.keyCode == 13) {
+          onclickButton();
+        }
+      });
+    </script>
+  </body>
+</html>
+
