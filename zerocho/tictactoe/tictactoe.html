@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TicTacToe</title>
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+
+      td {
+        border: 1px solid black;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let turn = 'O';
+      const rows = [];
+
+      const $table = document.createElement('table');
+      const $result = document.createElement('div');
+
+      const checkWinner = target => {
+        const rowIndex = target.parentNode.rowIndex; // 부모 노드인 테이블의 rowIndex 접근
+        const cellIndex = target.cellIndex; // target의 cellIndex 접근가능
+
+        // 수정전 로직
+        // let rowIndex;
+        // let cellIndex;
+
+        // rows.forEach((row, ri) => {
+        //   row.forEach((cell, ci) => {
+        //     if (cell === target) {
+        //       rowIndex = ri;
+        //       cellIndex = ci;
+        //     }
+        //   });
+        // });
+
+        let hasWinner = false;
+
+        // 가로
+        if (
+          rows[rowIndex][0].textContent === turn &&
+          rows[rowIndex][1].textContent === turn &&
+          rows[rowIndex][2].textContent === turn
+        ) {
+          hasWinner = true;
+        }
+
+        // 세로
+        if (
+          rows[0][cellIndex].textContent === turn &&
+          rows[1][cellIndex].textContent === turn &&
+          rows[2][cellIndex].textContent === turn
+        ) {
+          hasWinner = true;
+        }
+
+        // 대각선
+        if (rows[0][0].textContent === turn && rows[1][1].textContent === turn && rows[2][2].textContent === turn) {
+          hasWinner = true;
+        }
+
+        if (rows[0][2].textContent === turn && rows[1][1].textContent === turn && rows[2][0].textContent === turn) {
+          hasWinner = true;
+        }
+
+        return hasWinner;
+      };
+
+      const checkWinnerAndDraw = target => {
+        // 승부확인
+        const hasWinner = checkWinner(target);
+        if (hasWinner) {
+          $result.textContent = `게임끝 승자는${turn}`;
+          $table.removeEventListener('click', callback);
+          return;
+        }
+
+        // 무승부 검사
+
+        // 수정전 로직
+        // rows.forEach(row => {
+        //   row.forEach(cell => {
+        //     if (!cell.textContent) {
+        //       draw = false;
+        //     }
+        //   });
+        // });
+
+        // .flat() 2차원배열을 1차원 배열로 합쳐준다. (3차원배열은 2차원으로 만들어줌) 성능은 좋지 않은듯
+        // .every() 함수의 모든 요소가 반환 값을 true로 만드는지 확인
+        // .some() 함수의 반환 값을 true로 만드는 요소가 하나라도 있는지 확인
+
+        // 승자가 없으면
+        const draw = rows.flat().every(cell => cell.textContent);
+        if (draw) {
+          $result.textContent = '무승부';
+          return;
+        }
+
+        turn = turn === 'O' ? 'X' : 'O';
+      };
+      let clickable = true;
+      const callback = e => {
+        if (!clickable) return;
+        // 칸에 글자가 있나?
+        if (e.target.textContent !== '') {
+          console.log('빈칸이 아닙니다.');
+          return;
+        }
+        console.log('빈칸입니다');
+        e.target.textContent = turn;
+
+        // 승부판단
+        checkWinnerAndDraw(e.target);
+
+        if (turn === 'X') {
+          clickable = false;
+          setTimeout(() => {
+            const emptyCells = rows.flat().filter(v => !v.textContent);
+            const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            randomCell.textContent = 'X';
+            checkWinnerAndDraw(e.target);
+            clickable = true;
+          }, 1000);
+        }
+      };
+
+      for (let i = 0; i < 3; i++) {
+        const $tr = document.createElement('tr');
+        const cells = [];
+        for (let j = 0; j < 3; j++) {
+          const $td = document.createElement('td');
+          cells.push($td);
+          $tr.append($td);
+        }
+        rows.push(cells);
+        $table.append($tr);
+      }
+      $table.addEventListener('click', callback);
+      document.body.append($table);
+      document.body.append($result);
+    </script>
+  </body>
+</html>
