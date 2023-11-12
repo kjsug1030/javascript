@@ -24,6 +24,15 @@
       #screen.now {
         background-color: greenyellow;
       }
+
+      ul {
+        margin-left: 0;
+        padding: 0;
+      }
+
+      li {
+        list-style: none;
+      }
     </style>
   </head>
   <body>
@@ -31,7 +40,7 @@
     <div id="screen" class="wating">
       <div id="result">클릭해서 시작하세요</div>
     </div>
-
+    <ul id="score-list"></ul>
     <script>
       let prevTime;
       let currentTime;
@@ -40,55 +49,56 @@
       const $screen = document.querySelector('#screen');
       const $wating = document.querySelector('.wating');
       const $result = document.querySelector('#result');
-      // const $ready = document.createElement('.ready');
-      // const $now = document.createElement('.now');
-      const $div = document.createElement('div');
-      const $button = document.createElement('button');
-      $button.className = 'reset';
-      let randomSecond = Math.trunc(Math.random() * 3 + 2) * 1000;
-
-      const onReady = () => {
-        $screen.className = 'ready';
-      };
-
+      const $scoreList = document.querySelector('#score-list');
+      const scoreArr = [];
+      let timer;
       $screen.addEventListener('click', e => {
         if (e.target.classList.contains('wating')) {
+          let randomSecond = Math.trunc(Math.random() * 3 + 2) * 1000;
+          console.log(randomSecond);
+          timerOn = true;
+          // $screen.classList.remove('wating');
+          // $screen.classList.remove('ready');
           $screen.classList.replace('wating', 'ready');
           $result.textContent = '초록색이 되면 클릭하세요';
-          const timer = setTimeout(() => {
-            // timerOn = true;
+          timer = setTimeout(() => {
+            // $screen.classList.remove('ready');
+            // $screen.classList.remove('now');
             $screen.classList.replace('ready', 'now');
             console.log('반응속도 측정 테스트 시작');
+            $result.textContent = '클릭하세요!';
             prevTime = Date.now();
             console.log(prevTime);
           }, randomSecond);
         } else if (e.target.classList.contains('ready')) {
-          $result.textContent = '클릭하세요!';
+          clearTimeout(timer);
+          $screen.classList.replace('ready', 'wating');
+          $result.textContent = '너무 성급하시군요!';
         } else if (e.target.classList.contains('now')) {
-          // if (!timerOn) {
-          //   return alert('성급합니다. 다시시작해주세요');
-          // }
-
           currentTime = Date.now();
           console.log(currentTime);
 
           const currentScore = currentTime - prevTime;
           $result.textContent = `당신의 반응속도는 ${currentScore}ms 입니다!`;
+          const $div = document.createElement('div');
+          $div.textContent = '다시하기';
+          $result.append($div);
+          scoreArr.push(currentScore);
+          console.log(scoreArr);
+          const $li = document.createElement('li');
+          $li.innerHTML = `<li>${scoreArr.length}번째 속도: ${scoreArr[scoreArr.length - 1]}ms</li>`;
+          $scoreList.append($li);
+          $screen.classList.replace('now', 'wating');
+
+          // 반응속도 평균 구하기
+          if (scoreArr.length >= 5) {
+            const divisionSpeed = scoreArr.reduce((prev, cur) => prev + cur, 0);
+            const $li = document.createElement('li');
+            $li.innerHTML = `<li>평균반응속도는 ${Math.trunc(divisionSpeed / 5)}ms 입니다</li>`;
+            $scoreList.append($li);
+          }
         }
       });
-
-      const onTimeCheck = () => {};
-
-      // const reset = () => {
-      //   $body.addEventListener('click', onTimeCheck);
-      //   document.body.style.backgroundColor = 'blue';
-      //   timerOn = false;
-      //   prevTime = 0;
-      //   currentTime = 0;
-      // };
-
-      // $body.addEventListener('click', onTimeCheck);
-      // $button.addEventListener('click', reset);
     </script>
   </body>
 </html>
