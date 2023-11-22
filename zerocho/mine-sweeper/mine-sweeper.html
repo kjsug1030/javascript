@@ -80,6 +80,39 @@
         return data;
       }
 
+      function onRightClick(event) {
+        event.preventDefault();
+        const target = event.target;
+        const rowIndex = target.parentNode.rowIndex;
+        const cellIndex = target.cellIndex;
+        const cellData = data[rowIndex][cellIndex];
+        if (cellData === CODE.MINE) {
+          data[rowIndex][cellIndex] = CODE.QUESTION_MINE;
+          target.className = 'question';
+          target.textContent = '?';
+        } else if (cellData === CODE.QUESTION_MINE) {
+          data[rowIndex][cellIndex] = CODE.FLAG_MINE;
+          target.className = 'flag';
+          target.textContent = '!';
+        } else if (cellData === CODE.FLAG_MINE) {
+          data[rowIndex][cellIndex] = CODE.MINE;
+          target.className = '';
+          target.textContent = 'X';
+        } else if (cellData === CODE.NORMAL) {
+          data[rowIndex][cellIndex] = CODE.QUESTION;
+          target.className = 'question';
+          target.textContent = '?';
+        } else if (cellData === CODE.QUESTION) {
+          data[rowIndex][cellIndex] = CODE.FLAG;
+          target.className = 'flag';
+          target.textContent = '!';
+        } else if (cellData === CODE.FLAG) {
+          data[rowIndex][cellIndex] = CODE.NORMAL;
+          target.className = '';
+          target.textContent = '';
+        }
+      }
+
       function drawTable() {
         data = plantMine();
         data.forEach(row => {
@@ -92,6 +125,7 @@
             $tr.append($td);
           });
           $tbody.append($tr);
+          $tbody.addEventListener('contextmenu', onRightClick);
         });
       }
       drawTable();
