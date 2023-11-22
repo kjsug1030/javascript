@@ -80,6 +80,64 @@
         return data;
       }
 
+      // 1 2 3
+      // 4 5 6
+      // 7 8 9
+      function countMine(rowIndex, cellIndex) {
+        const mines = [CODE.MINE, CODE.QUESTION_MINE, CODE.FLAG_MINE];
+        let i = 0;
+        mines.includes(data[rowIndex - 1]?.[cellIndex - 1]) && i++;
+        mines.includes(data[rowIndex - 1]?.[cellIndex]) && i++;
+        mines.includes(data[rowIndex - 1]?.[cellIndex + 1]) && i++;
+        mines.includes(data[rowIndex][cellIndex - 1]) && i++;
+        mines.includes(data[rowIndex][cellIndex + 1]) && i++;
+        mines.includes(data[rowIndex + 1]?.[cellIndex - 1]) && i++;
+        mines.includes(data[rowIndex + 1]?.[cellIndex]) && i++;
+        mines.includes(data[rowIndex + 1]?.[cellIndex + 1]) && i++;
+
+        return i;
+      }
+
+      function openArea(count) {
+        const target = event.target;
+        const rowIndex = target.parentNode.rowIndex;
+        const cellIndex = target.cellIndex;
+        const cellData = data[rowIndex][cellIndex];
+
+        if (count === 0) {
+          target.className = 'opened';
+
+          data[rowIndex - 1]?.[cellIndex - 1];
+          data[rowIndex - 1]?.[cellIndex];
+          data[rowIndex - 1]?.[cellIndex + 1];
+          data[rowIndex][cellIndex - 1];
+          data[rowIndex][cellIndex + 1];
+          data[rowIndex + 1]?.[cellIndex - 1];
+          data[rowIndex + 1]?.[cellIndex];
+          data[rowIndex + 1]?.[cellIndex + 1];
+        }
+      }
+
+      function onLeftClick(event) {
+        const target = event.target;
+        const rowIndex = target.parentNode.rowIndex;
+        const cellIndex = target.cellIndex;
+        const cellData = data[rowIndex][cellIndex];
+
+        if (cellData === CODE.NORMAL) {
+          const count = countMine(rowIndex, cellIndex);
+          target.className = 'opened';
+          target.textContent = count || '';
+          data[rowIndex][cellIndex] = count;
+          openArea(count);
+        } else if (cellData === CODE.MINE) {
+          target.textContent = '펑';
+          target.className = 'opened';
+          $tbody.removeEventListener('click', onLeftClick);
+          $tbody.removeEventListener('contextmenu', onRightClick);
+        }
+      }
+
       function onRightClick(event) {
         event.preventDefault();
         const target = event.target;
@@ -125,6 +183,7 @@
             $tr.append($td);
           });
           $tbody.append($tr);
+          $tbody.addEventListener('click', onLeftClick);
           $tbody.addEventListener('contextmenu', onRightClick);
         });
       }
