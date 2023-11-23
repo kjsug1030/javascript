@@ -63,10 +63,9 @@
 
       function onSubmit(event) {
         event.preventDefault();
-        console.log(event.target);
         row = parseInt(event.target.row.value);
         cell = parseInt(event.target.cell.value);
-        mine = parseInt(event.target.cell.value);
+        mine = parseInt(event.target.mine.value);
         openCount = 0;
         clearInterval(interval);
         $tbody.innerHTML = '';
@@ -169,18 +168,68 @@
         }, 0);
       }
 
+      let normalCellFound = false;
+      let searched;
+      let firstClick = true;
+
+      function changeMine(rI, cI) {
+        if (normalCellFound) return; // 이미 빈칸을 찾았으면 종료
+        if (rI < 0 || rI >= row || cI < 0 || cI >= cell) return;
+        if (searched[rI][cI]) return; // 이미 찾은 칸이면 종료
+        if (data[rI]?.[cI] === CODE.NORMAL) {
+          normalCellFound = true;
+          data[rI][cI] = CODE.MINE;
+        } else {
+          // 지뢰 칸인 경우 8방향 탐색
+          searched[rI][cI] = true;
+          changeMine(rI - 1, cI - 1);
+          changeMine(rI - 1, cI);
+          changeMine(rI - 1, cI + 1);
+          changeMine(rI, cI - 1);
+          changeMine(rI, cI + 1);
+          changeMine(rI + 1, cI - 1);
+          changeMine(rI + 1, cI);
+          changeMine(rI + 1, cI + 1);
+        }
+      }
+
+      function showMines() {
+        const mines = [CODE.MINE, CODE.QUESTION_MINE, CODE.FLAG_MINE];
+        data.forEach((row, rowIndex) => {
+          row.forEach((cell, cellIndex) => {
+            if (mines.includes(cell)) {
+              $tbody.children[rowIndex].children[cellIndex].textContent = 'X';
+            }
+          });
+        });
+      }
+
       function onLeftClick(event) {
         const target = event.target;
         const rowIndex = target.parentNode.rowIndex;
         const cellIndex = target.cellIndex;
-        const cellData = data[rowIndex][cellIndex];
+        let cellData = data[rowIndex][cellIndex];
+
+        if (firstClick) {
+          firstClick = false;
+          searched = Array(row)
+            .fill()
+            .map(() => []);
+          if (cellData === CODE.MINE) {
+            // 첫 클릭이 지뢰면
+            changeMine(rowIndex, cellIndex); // 지뢰 옮기기
+            data[rowIndex][cellIndex] = CODE.NORMAL;
+            cellData = CODE.NORMAL;
+          }
+        }
 
         if (cellData === CODE.NORMAL) {
           openAround(rowIndex, cellIndex);
         } else if (cellData === CODE.MINE) {
-          clearInterval(interval);
+          showMines();
           target.textContent = '펑';
           target.className = 'opened';
+          clearInterval(interval);
           $tbody.removeEventListener('click', onLeftClick);
           $tbody.removeEventListener('contextmenu', onRightClick);
         }
@@ -203,7 +252,7 @@
         } else if (cellData === CODE.FLAG_MINE) {
           data[rowIndex][cellIndex] = CODE.MINE;
           target.className = '';
-          target.textContent = 'X';
+          // target.textContent = 'X';
         } else if (cellData === CODE.NORMAL) {
           data[rowIndex][cellIndex] = CODE.QUESTION;
           target.className = 'question';
@@ -226,7 +275,7 @@
           row.forEach(cell => {
             const $td = document.createElement('td');
             if (cell === CODE.MINE) {
-              $td.textContent = 'X'; // 개발 편의를 위해
+              // $td.textContent = 'X'; // 개발 편의를 위해
             }
             $tr.append($td);
           });
