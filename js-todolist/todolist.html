@@ -28,10 +28,14 @@
           <button class="btn back__btn">&lt;&nbsp;Back</button>
           <div class="time"></div>
         </div>
-        <div id="list"></div>
+        <div id="list">
+          <ul>
+            <li class="no-result">No Result</li>
+          </ul>
+        </div>
         <form class="note none">
-          <input type="text" name="title" placeholder="Note Title" />
-          <textarea name="content" cols="30" rows="10" placeholder="Enter note text"></textarea>
+          <input type="text" name="title" placeholder="Note Title" required />
+          <textarea name="content" cols="30" rows="10" placeholder="Enter note text" required></textarea>
           <div class="change none">
             <button type="button" class="btn remove">Remove Note</button>
             <button type="submit" class="btn done">Done</button>
@@ -48,7 +52,9 @@
       const $removeBtn = document.querySelector('.remove');
       const $backBtn = document.querySelector('.back__btn');
       const $defaultDiv = document.querySelector('.default');
-      const $listDiv = document.querySelector('#list');
+      const $ul = document.querySelector('#list ul');
+      const $li = document.querySelector('li');
+      const $noResult = document.querySelector('.no-result');
       const $changeDiv = document.querySelector('.change');
       const $searchDiv = document.querySelector('.search');
       const $backDiv = document.querySelector('.back');
@@ -65,6 +71,9 @@
         $backDiv.classList.add('none');
         $defaultDiv.classList.remove('none');
         $searchDiv.classList.remove('none');
+        $ul.classList.remove('none');
+
+        // todolist.filter(())
       }
 
       function onClickBack() {
@@ -73,6 +82,10 @@
         $backDiv.classList.add('none');
         $defaultDiv.classList.remove('none');
         $searchDiv.classList.remove('none');
+        $ul.classList.remove('none');
+
+        // event.target.title.value = '';
+        // event.target.content.value = '';
       }
 
       function onCreateNote(event) {
@@ -85,21 +98,24 @@
         todolist.push(contents);
         $form.classList.add('none');
         $changeDiv.classList.add('none');
-        $backDiv.classList.remove('none');
+        $backDiv.classList.add('none');
         $searchDiv.classList.remove('none');
         $defaultDiv.classList.remove('none');
+        $ul.classList.remove('none');
         event.target.title.value = '';
         event.target.content.value = '';
-        // console.log(`title: ${title} \ncontent: ${content}`);
-        console.log(todolist);
+        // console.log(todolist);
+        showTodoList();
       }
 
-      $createBtn.addEventListener('click', () => {
+      $createBtn.addEventListener('click', event => {
         $form.classList.remove('none');
         $backDiv.classList.remove('none');
         $defaultDiv.classList.add('none');
         $searchDiv.classList.add('none');
         $changeDiv.classList.remove('none');
+        $ul.classList.add('none');
+
         console.log('create note button click!');
       });
 
@@ -108,21 +124,39 @@
       $backBtn.addEventListener('click', onClickBack);
 
       const $div = document.createElement('div');
-      function showTodoList() {
-        if (todolist.length <= 0) {
-          $listDiv.textContent = 'No Result';
-        } else {
-          todolist.forEach(item => {
-            $div.textContent = item.title;
-            $div.textContent = item.content;
-          });
-        }
-      }
-      $div.textContent = 'teste';
-      $backDiv.append($div);
 
-      // showTodoList();
-      console.log(todolist);
+      function showTodoList() {
+        if (todolist.length >= 0) {
+          $noResult.classList.add('none');
+        }
+        const $li = document.createElement('li');
+        todolist.forEach((list, idx) => {
+          $li.textContent = `id: ${idx} title: ${list.title} \ncontent: ${list.content}`;
+          $li.addEventListener('click', onClickList(list, idx));
+        });
+
+        $ul.append($li);
+      }
+
+      const onClickList = (list, idx) => () => {
+        // const contents = {};
+        // contents.title = title;
+        // contents.content = content;
+        $form.classList.remove('none');
+        $changeDiv.classList.remove('none');
+        $backDiv.classList.remove('none');
+        $searchDiv.classList.add('none');
+        $defaultDiv.classList.add('none');
+        $ul.classList.add('none');
+        $form.title.value = list.title;
+        $form.content.value = list.content;
+        // event.target.title.value = '';
+        // event.target.content.value = '';
+        console.log($form.title);
+        console.log(list);
+        console.log(idx);
+        // console.log('this: ' + this.tile);
+      };
     </script>
   </body>
 </html>

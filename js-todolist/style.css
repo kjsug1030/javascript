@@ -5,8 +5,12 @@
   font-family: 'Noto Sans KR', sans-serif;
 }
 
-li {
+a {
   text-decoration: none;
+}
+
+li {
+  list-style: none;
 }
 
 #container {
@@ -18,9 +22,7 @@ li {
 #card {
   display: inline-block;
   position: relative;
-  /* width: 500px; */
   width: 22%;
-  /* height: 450px; */
   padding: 60px 15px 30px 15px;
   background-color: #fff;
   border-radius: 10px;
@@ -111,4 +113,22 @@ li {
 
 .note input {
   height: 34px;
+}
+
+#list li {
+  padding: 6px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  /* color: #212529; */
+  border: solid 1px #ced4da;
+}
+
+#list li:hover {
+  cursor: pointer;
+  background-color: #ced4da;
+}
+
+.no-result:hover {
+  cursor: none;
+  background-color: initial;
 }
