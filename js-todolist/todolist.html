@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&family=Noto+Sans+KR:wght@100;400&family=Playfair+Display:ital@1&display=swap"
+      rel="stylesheet"
+    />
+    <title>투두리스트</title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="card">
+        <h1>Notes App</h1>
+        <p>Take notes and never forget</p>
+        <div class="search">
+          <input type="text" class="search__input" placeholder="Search" />
+          <select name="sort" class="search__select" id="sort">
+            <option value="defalut">최신순</option>
+            <option value="latest">수정시간순</option>
+          </select>
+        </div>
+        <div class="back none">
+          <button class="btn back__btn">&lt;&nbsp;Back</button>
+          <div class="time"></div>
+        </div>
+        <div id="list"></div>
+        <form class="note none">
+          <input type="text" name="title" placeholder="Note Title" />
+          <textarea name="content" cols="30" rows="10" placeholder="Enter note text"></textarea>
+          <div class="change none">
+            <button type="button" class="btn remove">Remove Note</button>
+            <button type="submit" class="btn done">Done</button>
+          </div>
+        </form>
+        <div class="default">
+          <button class="btn create">Create Note</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const $form = document.querySelector('form');
+      const $createBtn = document.querySelector('.create');
+      const $removeBtn = document.querySelector('.remove');
+      const $backBtn = document.querySelector('.back__btn');
+      const $defaultDiv = document.querySelector('.default');
+      const $listDiv = document.querySelector('#list');
+      const $changeDiv = document.querySelector('.change');
+      const $searchDiv = document.querySelector('.search');
+      const $backDiv = document.querySelector('.back');
+      const $doneBtn = document.querySelector('.done');
+
+      const todolist = [];
+      let title;
+      let content;
+
+      function onDeleteNote(event) {
+        event.preventDefault();
+        $form.classList.add('none');
+        $changeDiv.classList.add('none');
+        $backDiv.classList.add('none');
+        $defaultDiv.classList.remove('none');
+        $searchDiv.classList.remove('none');
+      }
+
+      function onClickBack() {
+        $form.classList.add('none');
+        $changeDiv.classList.add('none');
+        $backDiv.classList.add('none');
+        $defaultDiv.classList.remove('none');
+        $searchDiv.classList.remove('none');
+      }
+
+      function onCreateNote(event) {
+        event.preventDefault();
+        title = event.target.title.value;
+        content = event.target.content.value;
+        const contents = {};
+        contents.title = title;
+        contents.content = content;
+        todolist.push(contents);
+        $form.classList.add('none');
+        $changeDiv.classList.add('none');
+        $backDiv.classList.remove('none');
+        $searchDiv.classList.remove('none');
+        $defaultDiv.classList.remove('none');
+        event.target.title.value = '';
+        event.target.content.value = '';
+        // console.log(`title: ${title} \ncontent: ${content}`);
+        console.log(todolist);
+      }
+
+      $createBtn.addEventListener('click', () => {
+        $form.classList.remove('none');
+        $backDiv.classList.remove('none');
+        $defaultDiv.classList.add('none');
+        $searchDiv.classList.add('none');
+        $changeDiv.classList.remove('none');
+        console.log('create note button click!');
+      });
+
+      $form.addEventListener('submit', onCreateNote);
+      $removeBtn.addEventListener('click', onDeleteNote);
+      $backBtn.addEventListener('click', onClickBack);
+
+      const $div = document.createElement('div');
+      function showTodoList() {
+        if (todolist.length <= 0) {
+          $listDiv.textContent = 'No Result';
+        } else {
+          todolist.forEach(item => {
+            $div.textContent = item.title;
+            $div.textContent = item.content;
+          });
+        }
+      }
+      $div.textContent = 'teste';
+      $backDiv.append($div);
+
+      // showTodoList();
+      console.log(todolist);
+    </script>
+  </body>
+</html>
