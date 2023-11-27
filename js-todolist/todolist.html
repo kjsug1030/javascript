@@ -37,20 +37,21 @@
           <input type="text" name="title" placeholder="Note Title" required />
           <textarea name="content" cols="30" rows="10" placeholder="Enter note text" required></textarea>
           <div class="change none">
-            <button type="button" class="btn remove">Remove Note</button>
+            <button type="submit" class="btn remove">Remove Note</button>
             <button type="submit" class="btn done">Done</button>
           </div>
         </form>
         <div class="default">
-          <button class="btn create">Create Note</button>
+          <button type="submit" class="btn create">Create Note</button>
         </div>
       </div>
     </div>
     <script>
       const $form = document.querySelector('form');
+      const $backBtn = document.querySelector('.back__btn');
       const $createBtn = document.querySelector('.create');
       const $removeBtn = document.querySelector('.remove');
-      const $backBtn = document.querySelector('.back__btn');
+      const $doneBtn = document.querySelector('.done');
       const $defaultDiv = document.querySelector('.default');
       const $ul = document.querySelector('#list ul');
       const $li = document.querySelector('li');
@@ -58,21 +59,12 @@
       const $changeDiv = document.querySelector('.change');
       const $searchDiv = document.querySelector('.search');
       const $backDiv = document.querySelector('.back');
-      const $doneBtn = document.querySelector('.done');
 
       const todolist = [];
       let title;
       let content;
 
       function onDeleteNote(event) {
-        event.preventDefault();
-        $form.classList.add('none');
-        $changeDiv.classList.add('none');
-        $backDiv.classList.add('none');
-        $defaultDiv.classList.remove('none');
-        $searchDiv.classList.remove('none');
-        $ul.classList.remove('none');
-
         // todolist.filter(())
       }
 
@@ -88,7 +80,7 @@
         // event.target.content.value = '';
       }
 
-      function onCreateNote(event) {
+      function onCreateList(event) {
         event.preventDefault();
         title = event.target.title.value;
         content = event.target.content.value;
@@ -108,6 +100,22 @@
         showTodoList();
       }
 
+      const onRemoveList = id => event => {
+        event.preventDefault();
+        $form.classList.add('none');
+        $changeDiv.classList.add('none');
+        $backDiv.classList.add('none');
+        $defaultDiv.classList.remove('none');
+        $searchDiv.classList.remove('none');
+        $ul.classList.remove('none');
+
+        todolist.filter(list => {
+          list.id !== id;
+        });
+
+        showTodoList();
+      };
+
       $createBtn.addEventListener('click', event => {
         $form.classList.remove('none');
         $backDiv.classList.remove('none');
@@ -119,8 +127,8 @@
         console.log('create note button click!');
       });
 
-      $form.addEventListener('submit', onCreateNote);
-      $removeBtn.addEventListener('click', onDeleteNote);
+      $form.addEventListener('submit', onCreateList);
+
       $backBtn.addEventListener('click', onClickBack);
 
       const $div = document.createElement('div');
@@ -133,6 +141,7 @@
         todolist.forEach((list, idx) => {
           $li.textContent = `id: ${idx} title: ${list.title} \ncontent: ${list.content}`;
           $li.addEventListener('click', onClickList(list, idx));
+          // $form.addEventListener('submit', onRemoveList(idx));
         });
 
         $ul.append($li);
@@ -152,9 +161,9 @@
         $form.content.value = list.content;
         // event.target.title.value = '';
         // event.target.content.value = '';
-        console.log($form.title);
-        console.log(list);
-        console.log(idx);
+        // console.log($form.title);
+        // console.log(list);
+        // console.log(idx);
         // console.log('this: ' + this.tile);
       };
     </script>
