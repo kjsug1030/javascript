@@ -61,6 +61,10 @@ li {
   background-color: red;
 }
 
+.update {
+  background-color: greenyellow;
+}
+
 .search {
   display: flex;
   justify-content: space-between;

@@ -39,6 +39,7 @@
           <div class="change none">
             <button type="submit" class="btn remove">Remove Note</button>
             <button type="submit" class="btn done">Done</button>
+            <button class="btn update none">Upadte</button>
           </div>
         </form>
         <div class="default">
@@ -50,6 +51,7 @@
       const $form = document.querySelector('form');
       const $backBtn = document.querySelector('.back__btn');
       const $createBtn = document.querySelector('.create');
+      const $updateBtn = document.querySelector('.update');
       const $removeBtn = document.querySelector('.remove');
       const $doneBtn = document.querySelector('.done');
       const $defaultDiv = document.querySelector('.default');
@@ -64,10 +66,6 @@
       let title;
       let content;
 
-      function onDeleteNote(event) {
-        // todolist.filter(())
-      }
-
       function onClickBack() {
         $form.classList.add('none');
         $changeDiv.classList.add('none');
@@ -80,23 +78,52 @@
         // event.target.content.value = '';
       }
 
+      function onUpdateList(list) {
+        return event => {
+          event.preventDefault();
+          $doneBtn.classList.remove('none');
+          $updateBtn.classList.add('none');
+          $form.classList.add('none');
+          $changeDiv.classList.add('none');
+          $backDiv.classList.add('none');
+          $searchDiv.classList.remove('none');
+          $defaultDiv.classList.remove('none');
+          $ul.classList.remove('none');
+          const contents = {
+            ...list,
+            title: event.target.title.value,
+            content: event.target.content.value,
+          };
+          console.log('upadete list');
+          todolist.splice(list.id, 1, contents);
+          $form.removeEventListener('submit', onUpdateList(list));
+          event.target.title.value = '';
+          event.target.content.value = '';
+          showTodoList();
+        };
+      }
+
       function onCreateList(event) {
         event.preventDefault();
-        title = event.target.title.value;
-        content = event.target.content.value;
-        const contents = {};
-        contents.title = title;
-        contents.content = content;
-        todolist.push(contents);
+
         $form.classList.add('none');
         $changeDiv.classList.add('none');
         $backDiv.classList.add('none');
         $searchDiv.classList.remove('none');
         $defaultDiv.classList.remove('none');
         $ul.classList.remove('none');
+
+        const contents = {
+          id: todolist.length,
+          title: event.target.title.value,
+          content: event.target.content.value,
+        };
+
+        todolist.push(contents);
         event.target.title.value = '';
         event.target.content.value = '';
         // console.log(todolist);
+        console.log('create list');
         showTodoList();
       }
 
@@ -113,7 +140,10 @@
           list.id !== id;
         });
 
-        showTodoList();
+        console.log('remove list');
+        // console.log('result: ' + result);
+        console.log('id: ' + id);
+        // showTodoList();
       };
 
       $createBtn.addEventListener('click', event => {
@@ -128,7 +158,6 @@
       });
 
       $form.addEventListener('submit', onCreateList);
-
       $backBtn.addEventListener('click', onClickBack);
 
       const $div = document.createElement('div');
@@ -138,33 +167,29 @@
           $noResult.classList.add('none');
         }
         const $li = document.createElement('li');
-        todolist.forEach((list, idx) => {
-          $li.textContent = `id: ${idx} title: ${list.title} \ncontent: ${list.content}`;
-          $li.addEventListener('click', onClickList(list, idx));
-          // $form.addEventListener('submit', onRemoveList(idx));
+        todolist.forEach(list => {
+          $li.textContent = `id: ${list.id} title: ${list.title} \ncontent: ${list.content}`;
+          $li.addEventListener('click', onClickList(list));
+          $form.addEventListener('submit', onUpdateList(list));
         });
 
         $ul.append($li);
+
+        console.log(todolist);
       }
 
-      const onClickList = (list, idx) => () => {
-        // const contents = {};
-        // contents.title = title;
-        // contents.content = content;
+      const onClickList = list => () => {
         $form.classList.remove('none');
         $changeDiv.classList.remove('none');
         $backDiv.classList.remove('none');
         $searchDiv.classList.add('none');
         $defaultDiv.classList.add('none');
+        $doneBtn.classList.add('none');
+        $updateBtn.classList.remove('none');
         $ul.classList.add('none');
         $form.title.value = list.title;
         $form.content.value = list.content;
-        // event.target.title.value = '';
-        // event.target.content.value = '';
-        // console.log($form.title);
-        // console.log(list);
-        // console.log(idx);
-        // console.log('this: ' + this.tile);
+        $form.removeEventListener('submit', onCreateList);
       };
     </script>
   </body>
