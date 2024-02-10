@@ -43,7 +43,7 @@
           </div>
         </form>
         <div class="default">
-          <button type="submit" class="btn create">Create Note</button>
+          <button type="button" class="btn create">Create Note</button>
         </div>
       </div>
     </div>
@@ -65,7 +65,9 @@
       const todolist = [];
       let title;
       let content;
+      let cnt = 0;
 
+      // 뒤로가기
       function onClickBack(event) {
         event.preventDefault();
 
@@ -80,7 +82,6 @@
 
         $form.elements[0].value = ''; // title
         $form.elements[1].value = ''; // content
-
         $form.addEventListener('submit', onCreateList);
 
         console.log('뒤로가기');
@@ -88,6 +89,7 @@
 
       $backBtn.addEventListener('click', onClickBack);
 
+      // 업데이트
       function onUpdateList(list) {
         return event => {
           event.preventDefault();
@@ -114,9 +116,9 @@
         };
       }
 
-      function onCreateList(event) {
+      // 투두리스트 생성
+      const onCreateList = event => {
         event.preventDefault();
-
         $form.classList.add('none');
         $changeDiv.classList.add('none');
         $backDiv.classList.add('none');
@@ -125,7 +127,7 @@
         $ul.classList.remove('none');
 
         const contents = {
-          id: todolist.length,
+          id: cnt,
           title: event.target.title.value,
           content: event.target.content.value,
         };
@@ -133,36 +135,41 @@
         todolist.push(contents);
         event.target.title.value = '';
         event.target.content.value = '';
+        cnt++;
         // console.log(todolist);
         console.log('리스트 생성!');
         showTodoList();
-      }
+      };
 
+      // 삭제
       const onRemoveList = id => event => {
         event.preventDefault();
         $form.classList.add('none');
         $changeDiv.classList.add('none');
         $backDiv.classList.add('none');
+        $updateBtn.classList.add('none');
         $defaultDiv.classList.remove('none');
         $searchDiv.classList.remove('none');
         $ul.classList.remove('none');
+        $doneBtn.classList.remove('none');
 
         // event.target.title.value = '';
         // event.target.content.value = '';
 
-        let result = todolist.filter(list => list.id !== id);
-        console.log(result);
-        // todolist.splice(0, todolist.length, ...result);
-        // todolist.splice(0, todolist.length);
+        const result = todolist.filter(list => list.id !== id);
+        console.log(`삭제 후 배열: ${JSON.stringify(result)}`);
+        todolist.splice(0, todolist.length, ...result);
 
-        console.log('리스트 삭제!');
-        // console.log('result: ' + result);
-        // showTodoList();
+        $form.elements[0].value = ''; // title
+        $form.elements[1].value = ''; // content
+        $form.addEventListener('submit', onCreateList);
 
-        console.log(todolist);
+        console.log('삭제!');
+        showTodoList();
       };
 
-      const clickCreateBtn = event => {
+      // 생성버튼
+      const clickCreateBtn = () => {
         $form.classList.remove('none');
         $backDiv.classList.remove('none');
         $defaultDiv.classList.add('none');
@@ -179,11 +186,11 @@
 
       const $div = document.createElement('div');
 
-      function arrayTodoList() {
+      // 투두리스트 목록화면
+      function dislplayTodoList() {
         $ul.innerHTML = '';
         todolist.forEach(list => {
           const $li = document.createElement('li');
-          // 여기 어딘가가 잘못됐다. 리스트를 선택하면 전체리스트 값이 들어가버린다
           $li.textContent = `id: ${list.id} title: ${list.title} content: ${list.content}`;
           $li.addEventListener('click', onClickList(list));
           // $form.addEventListener('submit', onUpdateList(list));
@@ -196,13 +203,14 @@
         if (todolist.length >= 0) {
           $noResult.classList.add('none');
         }
-        // $ul.remove();
-        arrayTodoList();
+
+        dislplayTodoList();
 
         console.log('투두리스트 목록표시!');
         console.log(todolist);
       }
 
+      // 투두리스트 상세정보
       const onClickList = list => () => {
         $form.classList.remove('none');
         $changeDiv.classList.remove('none');
@@ -215,7 +223,8 @@
 
         $form.title.value = list.title;
         $form.content.value = list.content;
-        console.log('id: ' + list.id);
+
+        console.log('현재 리스트: ' + JSON.stringify(list));
 
         $form.removeEventListener('submit', onCreateList);
         $removeBtn.addEventListener('click', onRemoveList(list.id));
