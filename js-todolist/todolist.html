@@ -39,7 +39,7 @@
           <div class="change none">
             <button type="submit" class="btn remove">Remove Note</button>
             <button type="submit" class="btn done">Done</button>
-            <button class="btn update none">Update</button>
+            <button type="submit" class="btn update none">Update</button>
           </div>
         </form>
         <div class="default">
@@ -70,7 +70,6 @@
       // 뒤로가기
       function onClickBack(event) {
         event.preventDefault();
-
         $form.classList.add('none');
         $changeDiv.classList.add('none');
         $backDiv.classList.add('none');
@@ -82,39 +81,32 @@
 
         $form.elements[0].value = ''; // title
         $form.elements[1].value = ''; // content
-        $form.addEventListener('submit', onCreateList);
+
+        if ($updateBtn && $removeBtn) {
+          console.log('이벤트 삭제');
+          $updateBtn.removeEventListener('click', onUpdateList);
+          $removeBtn.removeEventListener('click', onRemoveList);
+        }
 
         console.log('뒤로가기');
       }
 
       $backBtn.addEventListener('click', onClickBack);
 
-      // 업데이트
-      function onUpdateList(list) {
-        return event => {
-          event.preventDefault();
-          $doneBtn.classList.remove('none');
-          $updateBtn.classList.add('none');
-          $form.classList.add('none');
-          $changeDiv.classList.add('none');
-          $backDiv.classList.add('none');
-          $searchDiv.classList.remove('none');
-          $defaultDiv.classList.remove('none');
-          $ul.classList.remove('none');
-          const contents = {
-            ...list,
-            title: event.target.title.value,
-            content: event.target.content.value,
-          };
-          console.log('리스트 업데이트!');
-          todolist.splice(list.id, 1, contents);
-          $form.removeEventListener('submit', onUpdateList(list));
-          event.target.title.value = '';
-          event.target.content.value = '';
-          // showTodoList();
-          console.log(todolist);
-        };
-      }
+      // 생성버튼
+      const clickCreateBtn = () => {
+        $form.classList.remove('none');
+        $backDiv.classList.remove('none');
+        $defaultDiv.classList.add('none');
+        $searchDiv.classList.add('none');
+        $changeDiv.classList.remove('none');
+        $ul.classList.add('none');
+
+        console.log('생성버튼');
+        $form.addEventListener('submit', onCreateList);
+      };
+
+      $createBtn.addEventListener('click', clickCreateBtn);
 
       // 투두리스트 생성
       const onCreateList = event => {
@@ -136,8 +128,11 @@
         event.target.title.value = '';
         event.target.content.value = '';
         cnt++;
-        // console.log(todolist);
+        console.log(todolist);
         console.log('리스트 생성!');
+        $form.removeEventListener('click', onCreateList);
+        $removeBtn.removeEventListener('click', onRemoveList);
+
         showTodoList();
       };
 
@@ -153,36 +148,19 @@
         $ul.classList.remove('none');
         $doneBtn.classList.remove('none');
 
-        // event.target.title.value = '';
-        // event.target.content.value = '';
-
         const result = todolist.filter(list => list.id !== id);
-        console.log(`삭제 후 배열: ${JSON.stringify(result)}`);
+        // console.log(`삭제 후 배열: ${JSON.stringify(result)}`);
         todolist.splice(0, todolist.length, ...result);
 
         $form.elements[0].value = ''; // title
         $form.elements[1].value = ''; // content
-        $form.addEventListener('submit', onCreateList);
+
+        $removeBtn.removeEventListener('click', onRemoveList);
+        $updateBtn.removeEventListener('click', onUpdateList);
 
         console.log('삭제!');
         showTodoList();
       };
-
-      // 생성버튼
-      const clickCreateBtn = () => {
-        $form.classList.remove('none');
-        $backDiv.classList.remove('none');
-        $defaultDiv.classList.add('none');
-        $searchDiv.classList.add('none');
-        $changeDiv.classList.remove('none');
-        $ul.classList.add('none');
-
-        console.log('생성버튼');
-      };
-
-      $createBtn.addEventListener('click', clickCreateBtn);
-
-      $form.addEventListener('submit', onCreateList);
 
       const $div = document.createElement('div');
 
@@ -193,14 +171,13 @@
           const $li = document.createElement('li');
           $li.textContent = `id: ${list.id} title: ${list.title} content: ${list.content}`;
           $li.addEventListener('click', onClickList(list));
-          // $form.addEventListener('submit', onUpdateList(list));
 
           $ul.append($li);
         });
       }
 
       function showTodoList() {
-        if (todolist.length >= 0) {
+        if (todolist.length > 0) {
           $noResult.classList.add('none');
         }
 
@@ -211,7 +188,8 @@
       }
 
       // 투두리스트 상세정보
-      const onClickList = list => () => {
+      const onClickList = list => event => {
+        event.preventDefault();
         $form.classList.remove('none');
         $changeDiv.classList.remove('none');
         $backDiv.classList.remove('none');
@@ -226,8 +204,38 @@
 
         console.log('현재 리스트: ' + JSON.stringify(list));
 
-        $form.removeEventListener('submit', onCreateList);
+        // $form.removeEventListener('submit', onCreateList);
+        $updateBtn.addEventListener('click', onUpdateList(list));
         $removeBtn.addEventListener('click', onRemoveList(list.id));
+      };
+
+      // 업데이트
+      const onUpdateList = list => event => {
+        event.preventDefault();
+        $doneBtn.classList.remove('none');
+        $updateBtn.classList.add('none');
+        $form.classList.add('none');
+        $changeDiv.classList.add('none');
+        $backDiv.classList.add('none');
+        $searchDiv.classList.remove('none');
+        $defaultDiv.classList.remove('none');
+        $ul.classList.remove('none');
+
+        const contents = {
+          ...list,
+          title: $form.elements[0].value,
+          content: $form.elements[1].value,
+        };
+
+        console.log('리스트 업데이트!');
+        todolist.splice(list.id, 1, contents);
+
+        $form.elements[0].value = '';
+        $form.elements[1].value = '';
+        $updateBtn.removeEventListener('click', onUpdateList);
+        $removeBtn.removeEventListener('click', onRemoveList);
+
+        showTodoList();
       };
     </script>
   </body>
