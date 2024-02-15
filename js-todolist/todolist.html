@@ -33,9 +33,9 @@
           <input type="text" name="title" placeholder="Note Title" required />
           <textarea name="content" cols="30" rows="10" placeholder="Enter note text" required></textarea>
           <div class="change none">
-            <button type="submit" name="action" value="delete" class="btn remove">Remove Note</button>
-            <button type="submit" name="action" value="add" class="btn done">Done</button>
-            <button type="submit" name="action" value="update" class="btn update none">Update</button>
+            <button type="submit" name="action" class="btn remove">Remove Note</button>
+            <button type="submit" name="action" class="btn done">Done</button>
+            <button type="submit" name="action" class="btn update none">Update</button>
           </div>
         </form>
         <div class="default">
@@ -63,38 +63,39 @@
       let todolist = [];
       let title;
       let content;
-      let cnt = 0;
+      let cnt;
+      let date = new Date();
       const TODOS_KEY = 'todos';
 
       const saveTodos = todos => {
         localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
       };
 
-      const parsedTodos = JSON.parse(localStorage.getItem(TODOS_KEY));
-
-      if (!parsedTodos) {
-        saveTodos([]);
-      }
+      render();
 
       function render() {
         const $ul = document.createElement('ul');
         $listDiv.innerHTML = '';
 
+        const parsedTodos = JSON.parse(localStorage.getItem(TODOS_KEY));
         todolist = parsedTodos;
 
-        if (todolist.length === 0 || todolist === null) {
+        if (todolist === null) {
+          saveTodos([]);
+          todolist = [];
+          cnt = 0;
+        } else {
+          cnt = todolist.length;
+          console.log(`cnt: ${cnt}`);
+        }
+
+        if (todolist.length < 1) {
           const $li = document.createElement('li');
           $li.textContent = 'No Result';
           $li.className = 'no-result';
           $ul.append($li);
         } else {
-          todolist.forEach(list => {
-            const $li = document.createElement('li');
-            $li.textContent = `id: ${list.id} title: ${list.title} content: ${list.content}`;
-            $li.addEventListener('click', onClickList(list));
-
-            $ul.append($li);
-          });
+          showTodosDisplay(todolist, $ul);
         }
 
         $listDiv.append($ul);
@@ -103,7 +104,23 @@
         console.log(todolist);
       }
 
-      render();
+      // 투두리스트 목록
+      function showTodosDisplay(array, element) {
+        array.forEach(list => {
+          const $li = document.createElement('li');
+          const $title = document.createElement('div');
+          const $content = document.createElement('div');
+          $title.textContent = `${list.title}`;
+          $title.className = 'title';
+          $content.textContent = `${list.content}`;
+          $content.className = 'content';
+          $li.append($title);
+          $li.append($content);
+          $li.addEventListener('click', onClickList(list));
+
+          element.append($li);
+        });
+      }
 
       // 생성버튼
       const onClickStartBtn = () => {
@@ -160,6 +177,8 @@
           id: cnt,
           title: event.target.title.value,
           content: event.target.content.value,
+          createdAt: date.getTime(),
+          updatedAt: date.getTime(),
         };
 
         todolist.push(contents);
@@ -191,7 +210,7 @@
         $defaultDiv.classList.remove('none');
         // $listDiv.innerHTML = '';
 
-        const result = todolist.filter(list => list.id !== Number($deleteBtn.id));
+        const result = todolist.filter(list => list.id !== parseInt($deleteBtn.id));
 
         // todolist.splice(0, todolist.length, ...result);
         console.log(result);
@@ -273,6 +292,24 @@
 
         render();
       };
+
+      const searchTodos = event => {
+        console.log(event.target.value);
+        const value = event.target.value.toLowerCase();
+        const result = todolist.filter(list => list.title.includes(value));
+
+        searchDataDisplay(result);
+      };
+
+      const searchDataDisplay = result => {
+        const $ul = document.createElement('ul');
+        $listDiv.innerHTML = '';
+        showTodosDisplay(result, $ul);
+        $listDiv.append($ul);
+      };
+
+      const $searchBar = document.getElementsByClassName('search__input');
+      $searchDiv.addEventListener('input', searchTodos);
     </script>
   </body>
 </html>

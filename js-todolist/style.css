@@ -120,7 +120,7 @@ li {
 }
 
 #list li {
-  padding: 6px;
+  padding: 6px 8px;
   margin-bottom: 10px;
   border-radius: 6px;
   /* color: #212529; */
@@ -135,4 +135,13 @@ li {
 .no-result:hover {
   cursor: none;
   background-color: initial;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.content {
+  font-size: 13px;
+  opacity: 0.7;
 }
