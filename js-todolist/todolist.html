@@ -273,15 +273,16 @@
         $updateBtn.classList.add('none');
 
         const id = parseInt($updateBtn.id);
+        const finedIndex = todolist.findIndex(list => list.id === id);
         const contents = {
-          ...todolist[id],
+          ...todolist[finedIndex],
           title: $form.elements[0].value,
           content: $form.elements[1].value,
+          updatedAt: date.getTime(),
         };
 
-        console.log(contents);
         console.log('리스트 업데이트!');
-        todolist.splice(id, 1, contents);
+        todolist.splice(finedIndex, 1, contents);
         saveTodos(todolist);
 
         $form.elements[0].value = '';
