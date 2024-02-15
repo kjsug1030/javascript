@@ -28,18 +28,14 @@
           <button class="btn back__btn">&lt;&nbsp;Back</button>
           <div class="time"></div>
         </div>
-        <div id="list">
-          <ul>
-            <li class="no-result">No Result</li>
-          </ul>
-        </div>
+        <div id="list"></div>
         <form class="note none">
           <input type="text" name="title" placeholder="Note Title" required />
           <textarea name="content" cols="30" rows="10" placeholder="Enter note text" required></textarea>
           <div class="change none">
-            <button type="submit" class="btn remove">Remove Note</button>
-            <button type="submit" class="btn done">Done</button>
-            <button type="submit" class="btn update none">Update</button>
+            <button type="submit" name="action" value="delete" class="btn remove">Remove Note</button>
+            <button type="submit" name="action" value="add" class="btn done">Done</button>
+            <button type="submit" name="action" value="update" class="btn update none">Update</button>
           </div>
         </form>
         <div class="default">
@@ -49,74 +45,116 @@
     </div>
     <script>
       const $form = document.querySelector('form');
+
       const $backBtn = document.querySelector('.back__btn');
       const $createBtn = document.querySelector('.create');
       const $updateBtn = document.querySelector('.update');
-      const $removeBtn = document.querySelector('.remove');
+      const $deleteBtn = document.querySelector('.remove');
       const $doneBtn = document.querySelector('.done');
+
       const $defaultDiv = document.querySelector('.default');
-      const $ul = document.querySelector('#list ul');
-      const $li = document.querySelector('li');
+      const $listDiv = document.querySelector('#list');
       const $noResult = document.querySelector('.no-result');
+
       const $changeDiv = document.querySelector('.change');
       const $searchDiv = document.querySelector('.search');
       const $backDiv = document.querySelector('.back');
 
-      const todolist = [];
+      let todolist = [];
       let title;
       let content;
       let cnt = 0;
+      const TODOS_KEY = 'todos';
+
+      const saveTodos = todos => {
+        localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
+      };
+
+      const parsedTodos = JSON.parse(localStorage.getItem(TODOS_KEY));
+
+      if (!parsedTodos) {
+        saveTodos([]);
+      }
+
+      function render() {
+        const $ul = document.createElement('ul');
+        $listDiv.innerHTML = '';
+
+        todolist = parsedTodos;
+
+        if (todolist.length === 0 || todolist === null) {
+          const $li = document.createElement('li');
+          $li.textContent = 'No Result';
+          $li.className = 'no-result';
+          $ul.append($li);
+        } else {
+          todolist.forEach(list => {
+            const $li = document.createElement('li');
+            $li.textContent = `id: ${list.id} title: ${list.title} content: ${list.content}`;
+            $li.addEventListener('click', onClickList(list));
+
+            $ul.append($li);
+          });
+        }
+
+        $listDiv.append($ul);
+
+        console.log('투두리스트 목록표시!');
+        console.log(todolist);
+      }
+
+      render();
+
+      // 생성버튼
+      const onClickStartBtn = () => {
+        $backDiv.classList.remove('none');
+        $searchDiv.classList.add('none');
+
+        $form.classList.remove('none');
+
+        $changeDiv.classList.remove('none');
+        $defaultDiv.classList.add('none');
+        $deleteBtn.disabled = true;
+
+        $listDiv.innerHTML = '';
+        console.log('생성버튼');
+      };
+
+      $createBtn.addEventListener('click', onClickStartBtn);
 
       // 뒤로가기
-      function onClickBack(event) {
-        event.preventDefault();
-        $form.classList.add('none');
-        $changeDiv.classList.add('none');
+      function onClickBack() {
         $backDiv.classList.add('none');
-        $defaultDiv.classList.remove('none');
         $searchDiv.classList.remove('none');
-        $ul.classList.remove('none');
+
+        $form.classList.add('none');
+
+        $changeDiv.classList.add('none');
+        $defaultDiv.classList.remove('none');
+
         $updateBtn.classList.add('none');
         $doneBtn.classList.remove('none');
 
         $form.elements[0].value = ''; // title
         $form.elements[1].value = ''; // content
 
-        if ($updateBtn && $removeBtn) {
-          console.log('이벤트 삭제');
-          $updateBtn.removeEventListener('click', onUpdateList);
-          $removeBtn.removeEventListener('click', onRemoveList);
-        }
+        $deleteBtn.removeEventListener('click', onClickDelete);
+        $updateBtn.removeEventListener('click', onClickUpdate);
 
         console.log('뒤로가기');
+        render();
       }
 
       $backBtn.addEventListener('click', onClickBack);
 
-      // 생성버튼
-      const clickCreateBtn = () => {
-        $form.classList.remove('none');
-        $backDiv.classList.remove('none');
-        $defaultDiv.classList.add('none');
-        $searchDiv.classList.add('none');
-        $changeDiv.classList.remove('none');
-        $ul.classList.add('none');
-
-        console.log('생성버튼');
-        $form.addEventListener('submit', onCreateList);
-      };
-
-      $createBtn.addEventListener('click', clickCreateBtn);
-
       // 투두리스트 생성
-      const onCreateList = event => {
+      const onClickCreate = event => {
         event.preventDefault();
         $form.classList.add('none');
         $changeDiv.classList.add('none');
         $backDiv.classList.add('none');
         $searchDiv.classList.remove('none');
         $defaultDiv.classList.remove('none');
-        $ul.classList.remove('none');
 
         const contents = {
           id: cnt,
@@ -125,117 +163,115 @@
         };
 
         todolist.push(contents);
+        saveTodos(todolist);
+
         event.target.title.value = '';
         event.target.content.value = '';
         cnt++;
-        console.log(todolist);
-        console.log('리스트 생성!');
-        $form.removeEventListener('click', onCreateList);
-        $removeBtn.removeEventListener('click', onRemoveList);
 
-        showTodoList();
+        console.log('리스트 생성!');
+
+        render();
       };
 
+      $form.addEventListener('submit', onClickCreate);
+
       // 삭제
-      const onRemoveList = id => event => {
+      const onClickDelete = event => {
         event.preventDefault();
         $form.classList.add('none');
-        $changeDiv.classList.add('none');
-        $backDiv.classList.add('none');
-        $updateBtn.classList.add('none');
-        $defaultDiv.classList.remove('none');
-        $searchDiv.classList.remove('none');
-        $ul.classList.remove('none');
-        $doneBtn.classList.remove('none');
 
-        const result = todolist.filter(list => list.id !== id);
-        // console.log(`삭제 후 배열: ${JSON.stringify(result)}`);
-        todolist.splice(0, todolist.length, ...result);
+        $backDiv.classList.add('none');
+        $searchDiv.classList.remove('none');
+
+        $doneBtn.classList.remove('none');
+        $updateBtn.classList.add('none');
+
+        $changeDiv.classList.add('none');
+        $defaultDiv.classList.remove('none');
+        // $listDiv.innerHTML = '';
+
+        const result = todolist.filter(list => list.id !== Number($deleteBtn.id));
+
+        // todolist.splice(0, todolist.length, ...result);
+        console.log(result);
+        saveTodos(result);
 
         $form.elements[0].value = ''; // title
         $form.elements[1].value = ''; // content
 
-        $removeBtn.removeEventListener('click', onRemoveList);
-        $updateBtn.removeEventListener('click', onUpdateList);
+        $deleteBtn.removeEventListener('click', onClickDelete);
+        $updateBtn.removeEventListener('click', onClickUpdate);
 
         console.log('삭제!');
-        showTodoList();
+        render();
       };
 
       const $div = document.createElement('div');
 
-      // 투두리스트 목록화면
-      function dislplayTodoList() {
-        $ul.innerHTML = '';
-        todolist.forEach(list => {
-          const $li = document.createElement('li');
-          $li.textContent = `id: ${list.id} title: ${list.title} content: ${list.content}`;
-          $li.addEventListener('click', onClickList(list));
-
-          $ul.append($li);
-        });
-      }
-
-      function showTodoList() {
-        if (todolist.length > 0) {
-          $noResult.classList.add('none');
-        }
-
-        dislplayTodoList();
-
-        console.log('투두리스트 목록표시!');
-        console.log(todolist);
-      }
-
       // 투두리스트 상세정보
-      const onClickList = list => event => {
-        event.preventDefault();
-        $form.classList.remove('none');
-        $changeDiv.classList.remove('none');
-        $backDiv.classList.remove('none');
-        $searchDiv.classList.add('none');
-        $defaultDiv.classList.add('none');
-        $doneBtn.classList.add('none');
-        $updateBtn.classList.remove('none');
-        $ul.classList.add('none');
+      function onClickList(list) {
+        return function (event) {
+          $backDiv.classList.remove('none');
+          $searchDiv.classList.add('none');
 
-        $form.title.value = list.title;
-        $form.content.value = list.content;
+          $form.classList.remove('none');
 
-        console.log('현재 리스트: ' + JSON.stringify(list));
+          $changeDiv.classList.remove('none');
+          $defaultDiv.classList.add('none');
+          $listDiv.innerHTML = '';
 
-        // $form.removeEventListener('submit', onCreateList);
-        $updateBtn.addEventListener('click', onUpdateList(list));
-        $removeBtn.addEventListener('click', onRemoveList(list.id));
-      };
+          $doneBtn.classList.add('none');
+          $updateBtn.classList.remove('none');
+
+          console.log(list);
+          $form.title.value = list.title;
+          $form.content.value = list.content;
+          $deleteBtn.id = list.id;
+          $updateBtn.id = list.id;
+
+          // console.log('현재 리스트: ' + JSON.stringify(list));
+          console.log('상세정보');
+
+          $deleteBtn.disabled = false;
+          $deleteBtn.addEventListener('click', onClickDelete);
+          $updateBtn.addEventListener('click', onClickUpdate);
+        };
+      }
 
       // 업데이트
-      const onUpdateList = list => event => {
+      const onClickUpdate = event => {
         event.preventDefault();
-        $doneBtn.classList.remove('none');
-        $updateBtn.classList.add('none');
-        $form.classList.add('none');
-        $changeDiv.classList.add('none');
         $backDiv.classList.add('none');
         $searchDiv.classList.remove('none');
-        $defaultDiv.classList.remove('none');
-        $ul.classList.remove('none');
 
+        $form.classList.add('none');
+
+        $changeDiv.classList.add('none');
+        $defaultDiv.classList.remove('none');
+
+        $doneBtn.classList.remove('none');
+        $updateBtn.classList.add('none');
+
+        const id = parseInt($updateBtn.id);
         const contents = {
-          ...list,
+          ...todolist[id],
           title: $form.elements[0].value,
           content: $form.elements[1].value,
         };
 
+        console.log(contents);
         console.log('리스트 업데이트!');
-        todolist.splice(list.id, 1, contents);
+        todolist.splice(id, 1, contents);
+        saveTodos(todolist);
 
         $form.elements[0].value = '';
         $form.elements[1].value = '';
-        $updateBtn.removeEventListener('click', onUpdateList);
-        $removeBtn.removeEventListener('click', onRemoveList);
 
-        showTodoList();
+        $updateBtn.removeEventListener('click', onClickUpdate);
+        $deleteBtn.removeEventListener('click', onClickDelete);
+
+        render();
       };
     </script>
   </body>
