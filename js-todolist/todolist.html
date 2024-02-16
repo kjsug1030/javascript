@@ -99,7 +99,8 @@
           $li.className = 'no-result';
           $ul.append($li);
         } else {
-          showTodosDisplay(todolist, $ul);
+          const sortValueCreatedAt = todolist.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf());
+          showTodosDisplay(sortValueCreatedAt, $ul);
         }
 
         $listDiv.append($ul);
@@ -321,13 +322,13 @@
         $listDiv.innerHTML = '';
 
         if (selectOptionValue === 'default') {
-          let sortValueCreatedAt = todolist.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf());
+          const sortValueCreatedAt = todolist.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf());
           showTodosDisplay(sortValueCreatedAt, $ul);
         } else if (selectOptionValue === 'latest') {
-          let sortValueUpdatedAt = todolist.sort((a, b) => b.updatedAt.valueOf() - a.updatedAt.valueOf());
+          const sortValueUpdatedAt = todolist.sort((a, b) => b.updatedAt.valueOf() - a.updatedAt.valueOf());
           showTodosDisplay(sortValueUpdatedAt, $ul);
         } else if (selectOptionValue === 'alphabet') {
-          let sortValueAlphabet = todolist.sort((a, b) => a.title.localeCompare(b.title));
+          const sortValueAlphabet = todolist.sort((a, b) => a.title.localeCompare(b.title));
           showTodosDisplay(sortValueAlphabet, $ul);
         }
         $listDiv.append($ul);
