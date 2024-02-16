@@ -10,6 +10,8 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700&family=Noto+Sans+KR:wght@100;400&family=Playfair+Display:ital@1&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"></script>
+
     <title>투두리스트</title>
   </head>
   <body>
@@ -20,8 +22,9 @@
         <div class="search">
           <input type="text" class="search__input" placeholder="Search" />
           <select name="sort" class="search__select" id="sort">
-            <option value="defalut">최신순</option>
-            <option value="latest">수정시간순</option>
+            <option value="default">최근작성순</option>
+            <option value="latest">최근수정순</option>
+            <option value="alphabet">알파벳순</option>
           </select>
         </div>
         <div class="back none">
@@ -44,6 +47,8 @@
       </div>
     </div>
     <script>
+      moment.locale('ko');
+
       const $form = document.querySelector('form');
 
       const $backBtn = document.querySelector('.back__btn');
@@ -59,7 +64,6 @@
       const $changeDiv = document.querySelector('.change');
       const $searchDiv = document.querySelector('.search');
       const $backDiv = document.querySelector('.back');
-
       let todolist = [];
       let title;
       let content;
@@ -104,7 +108,7 @@
         console.log(todolist);
       }
 
-      // 투두리스트 목록
+      // 투두리스트 상세정보
       function showTodosDisplay(array, element) {
         array.forEach(list => {
           const $li = document.createElement('li');
@@ -112,7 +116,7 @@
           const $content = document.createElement('div');
           $title.textContent = `${list.title}`;
           $title.className = 'title';
-          $content.textContent = `${list.content}`;
+          $content.textContent = `${moment(list.createdAt).fromNow()}`;
           $content.className = 'content';
           $li.append($title);
           $li.append($content);
@@ -295,7 +299,6 @@
       };
 
       const searchTodos = event => {
-        console.log(event.target.value);
         const value = event.target.value.toLowerCase();
         const result = todolist.filter(list => list.title.includes(value));
 
@@ -311,6 +314,27 @@
 
       const $searchBar = document.getElementsByClassName('search__input');
       $searchDiv.addEventListener('input', searchTodos);
+
+      const sortedTodos = event => {
+        const $ul = document.createElement('ul');
+        const selectOptionValue = event.target.value;
+        $listDiv.innerHTML = '';
+
+        if (selectOptionValue === 'default') {
+          let sortValueCreatedAt = todolist.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf());
+          showTodosDisplay(sortValueCreatedAt, $ul);
+        } else if (selectOptionValue === 'latest') {
+          let sortValueUpdatedAt = todolist.sort((a, b) => b.updatedAt.valueOf() - a.updatedAt.valueOf());
+          showTodosDisplay(sortValueUpdatedAt, $ul);
+        } else if (selectOptionValue === 'alphabet') {
+          let sortValueAlphabet = todolist.sort((a, b) => a.title.localeCompare(b.title));
+          showTodosDisplay(sortValueAlphabet, $ul);
+        }
+        $listDiv.append($ul);
+      };
+
+      const $sortBar = document.querySelector('#sort');
+      $sortBar.addEventListener('change', sortedTodos);
     </script>
   </body>
 </html>
