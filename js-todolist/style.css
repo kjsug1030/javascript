@@ -145,3 +145,25 @@ li {
   font-size: 13px;
   opacity: 0.7;
 }
+
+#pagenation {
+  display: flex;
+  justify-content: center;
+}
+
+#pagenation > span {
+  border: solid 1px gray;
+  border-radius: 2px;
+  padding: 6px 12px;
+}
+
+#pagenation > span:hover,
+#pagenation > span:focus {
+  background-color: #0088bb;
+  color: #fff;
+}
+
+.currentPage {
+  background-color: #0088bb;
+  color: #fff;
+}
