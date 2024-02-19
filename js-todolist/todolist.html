@@ -85,16 +85,16 @@
         const $ul = document.createElement('ul');
         $listDiv.innerHTML = '';
 
-        const parsedTodos = JSON.parse(localStorage.getItem(TODOS_KEY));
-        todolist = parsedTodos;
-
-        if (todolist === null) {
+        try {
+          const parsedTodos = JSON.parse(localStorage.getItem(TODOS_KEY));
+          todolist = parsedTodos;
+          cnt = todolist.length;
+          console.log(`cnt: ${cnt}`);
+        } catch (err) {
+          console.log(err);
           saveTodos([]);
           todolist = [];
           cnt = 0;
-        } else {
-          cnt = todolist.length;
-          console.log(`cnt: ${cnt}`);
         }
 
         if (todolist.length < 1) {
@@ -354,21 +354,22 @@
       const totoalPageLength = Math.ceil(todolist.length / PAGE_LENGTH);
       const $pagenationBar = document.querySelector('#pagenation');
       const $prev = document.querySelector('#prev');
+      const $next = document.querySelector('#next');
 
-      const disiplayPagenation = () => {
-        for (let i = 0; i < totoalPageLength; i++) {
-          const $span = document.createElement('span');
-          $span.textContent = i + 1;
-          $span.className = 'item';
-          if (i === 0) {
-            $span.classList.add('currentPage');
-          }
-          $prev.before($span);
-        }
-        $pagenationBar.prepend($prev);
-      };
+      // const disiplayPagenation = () => {
+      //   for (let i = 0; i < totoalPageLength; i++) {
+      //     const $span = document.createElement('span');
+      //     $span.textContent = i + 1;
+      //     $span.className = 'item';
+      //     if (i === 0) {
+      //       $span.classList.add('currentPage');
+      //     }
+      //     $prev.before($span);
+      //   }
+      //   $pagenationBar.prepend($prev);
+      // };
 
-      disiplayPagenation();
+      // disiplayPagenation();
 
       let prevPageNumber = 1;
       console.log(`${prevPageNumber} 페이지`);
@@ -394,7 +395,7 @@
         } else if (currentPageNumber === '<') {
           currentPageNumber = prevPageNumber;
           startArrayNumber = (currentPageNumber - 2) * PAGE_LENGTH;
-          endArrayNumber = startArrayNumber === 0 ? 5 : startArrayNumber / 2;
+          endArrayNumber = startArrayNumber === 0 ? 5 : startArrayNumber * 2;
           prevPageNumber -= 1;
           console.log('startArrayNumber: ' + startArrayNumber);
         } else if (currentPageNumber === '>') {
@@ -418,15 +419,37 @@
         for (const item of $span_items) {
           item.classList.remove('currentPage');
         }
-        event.target.classList.toggle('currentPage');
-        console.log(event.target);
+
+        if ($span_items) {
+          event.target.classList.toggle('currentPage');
+        }
         showTodosDisplay(currentPageArray, $ul);
 
         $listDiv.append($ul);
       };
 
-      const $pagenationSpan = document.querySelectorAll('.item');
-      $pagenationSpan.addEventListener('click', onClickPage);
+      const disiplayPagenation = () => {
+        for (let i = 0; i < totoalPageLength; i++) {
+          const $span = document.createElement('span');
+          $span.textContent = i + 1;
+          $span.className = 'item';
+          if (i === 0) {
+            $span.classList.add('currentPage');
+          }
+          $span.addEventListener('click', onClickPage);
+          $prev.before($span);
+        }
+        $prev.addEventListener('click', onClickPage);
+        $next.addEventListener('click', onClickPage);
+
+        $pagenationBar.prepend($prev);
+      };
+
+      disiplayPagenation();
+
+      // const $pagenationSpan = document.querySelectorAll('.item');
+      // $pagenationSpan.addEventListener('click', onClickPage);
+      // 페이지네이션 기능 자체는 구현 완료인데 화살표 버튼이랑 부모 노드가 클릭되면 css 입혀지는 버그가 있다
       // $pagenationBar.addEventListener('click', onClickPage);
     </script>
   </body>
