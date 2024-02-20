@@ -45,8 +45,8 @@
           <button type="button" class="btn create">Create Note</button>
         </div>
         <div id="pagenation">
-          <span id="prev">&lt;</span>
-          <span id="next">&gt;</span>
+          <!-- <span id="prev">&lt;</span>
+          <span id="next">&gt;</span> -->
         </div>
       </div>
     </div>
@@ -304,6 +304,120 @@
         render();
       };
 
+      const pagenation = event => {
+        const pageLength = Math.ceil(todolist.length / 5);
+        console.log('페이지 수: ' + pageLength);
+
+        console.log(event.target.textContent);
+        const currentPageArray = todolist.slice(pageLength, 5);
+      };
+
+      const PAGE_LENGTH = 5;
+      const totoalPageLength = Math.ceil(todolist.length / PAGE_LENGTH);
+      const $pagenationBar = document.querySelector('#pagenation');
+      const $prev = document.querySelector('#prev');
+      const $next = document.querySelector('#next');
+
+      let prevPageNumber = 1;
+      console.log(`${prevPageNumber} 페이지`);
+
+      const onClickPage = event => {
+        // console.log('총페이지 수: ' + totoalPageLength);
+
+        let currentPageNumber = event.target.textContent;
+        !isNaN(parseInt(currentPageNumber)) ? (prevPageNumber = parseInt(currentPageNumber)) : '';
+
+        console.log(`이전 페이지: ${prevPageNumber}`);
+        console.log(`현재 페이지: ${currentPageNumber}`);
+
+        // const startArrayNumber = (currentPageNumber - 1) * PAGE_LENGTH;
+
+        let startArrayNumber;
+        let endArrayNumber = currentPageNumber * PAGE_LENGTH;
+
+        console.log('prevPage:', prevPageNumber);
+
+        // 처음과 끝 페이지에서 페이지네이션
+        if (currentPageNumber === '<' && prevPageNumber === 1) {
+          currentPageNumber = prevPageNumber;
+          startArrayNumber = 0;
+          endArrayNumber = 5;
+        } else if (currentPageNumber === '>' && prevPageNumber === totoalPageLength) {
+          currentPageNumber = prevPageNumber;
+          startArrayNumber = currentPageNumber * PAGE_LENGTH;
+          endArrayNumber = startArrayNumber + 5;
+          console.log('startArrayNumber: ' + startArrayNumber);
+        }
+
+        // 통상적인 페이지네이션
+        if (currentPageNumber === '<') {
+          currentPageNumber = prevPageNumber;
+          startArrayNumber = (currentPageNumber - 2) * PAGE_LENGTH;
+          endArrayNumber = startArrayNumber === 0 ? 5 : startArrayNumber * 2;
+          prevPageNumber -= 1;
+          console.log('startArrayNumber: ' + startArrayNumber);
+        } else if (currentPageNumber === '>') {
+          currentPageNumber = prevPageNumber;
+          startArrayNumber = currentPageNumber * PAGE_LENGTH;
+          endArrayNumber = startArrayNumber + 5;
+          prevPageNumber = prevPageNumber + 1;
+          console.log('startArrayNumber: ' + startArrayNumber);
+        } else {
+          startArrayNumber = (currentPageNumber - 1) * PAGE_LENGTH;
+        }
+
+        console.log('endArrayNumber: ' + endArrayNumber);
+
+        const currentPageArray = todolist.slice(startArrayNumber, endArrayNumber);
+        console.log(currentPageArray);
+
+        const $ul = document.createElement('ul');
+        const $span_items = document.querySelectorAll('.item');
+        $listDiv.innerHTML = '';
+
+        for (const item of $span_items) {
+          item.classList.remove('currentPage');
+        }
+
+        // 현재 페이지 태그의 색상을 변경
+        $span_items[prevPageNumber - 1].classList.add('currentPage');
+
+        showTodosDisplay(currentPageArray, $ul);
+
+        $listDiv.append($ul);
+      };
+
+      const disiplayPagenation = () => {
+        const $prev = document.createElement('span');
+        const $next = document.createElement('span');
+        prevPageNumber = 1;
+
+        $prev.id = 'prev';
+        $next.id = 'next';
+        $prev.innerHTML = '&lt;';
+        $next.innerHTML = '&gt;';
+
+        $pagenationBar.innerHTML = '';
+        $pagenationBar.append($prev);
+
+        for (let i = 0; i < totoalPageLength; i++) {
+          const $span = document.createElement('span');
+          $span.textContent = i + 1;
+          $span.id = i + 1;
+          $span.className = 'item';
+          if (i === 0) {
+            $span.classList.add('currentPage');
+          }
+          $span.addEventListener('click', onClickPage);
+          $pagenationBar.append($span);
+        }
+        $prev.addEventListener('click', onClickPage);
+        $next.addEventListener('click', onClickPage);
+        $pagenationBar.append($next);
+      };
+
+      disiplayPagenation();
+
       const searchTodos = event => {
         const value = event.target.value.toLowerCase();
         const result = todolist.filter(list => list.title.includes(value));
@@ -338,121 +452,11 @@
         }
         $listDiv.append($ul);
         // sort 버튼을 누르면 페이지네이션이 innerHTML이 초기화 되지않고 페이지네이션바가 중복된다.
-        // disiplayPagenation();
+        disiplayPagenation();
       };
 
       const $sortBar = document.querySelector('#sort');
       $sortBar.addEventListener('change', sortedTodos);
-
-      const pagenation = event => {
-        const pageLength = Math.ceil(todolist.length / 5);
-        console.log('페이지 수: ' + pageLength);
-
-        console.log(event.target.textContent);
-        const currentPageArray = todolist.slice(pageLength, 5);
-      };
-
-      const PAGE_LENGTH = 5;
-      const totoalPageLength = Math.ceil(todolist.length / PAGE_LENGTH);
-      const $pagenationBar = document.querySelector('#pagenation');
-      const $prev = document.querySelector('#prev');
-      const $next = document.querySelector('#next');
-
-      let prevPageNumber = 1;
-      console.log(`${prevPageNumber} 페이지`);
-
-      const onClickPage = event => {
-        // console.log('총페이지 수: ' + totoalPageLength);
-
-        let currentPageNumber = event.target.textContent;
-        !isNaN(parseInt(currentPageNumber)) ? (prevPageNumber = currentPageNumber) : '';
-
-        console.log(`이전 페이지: ${prevPageNumber}`);
-        console.log(`현재 페이지: ${currentPageNumber}`);
-
-        // const startArrayNumber = (currentPageNumber - 1) * PAGE_LENGTH;
-
-        let startArrayNumber;
-        let endArrayNumber = currentPageNumber * PAGE_LENGTH;
-
-        // 처음과 끝 페이지에서 페이지네이션
-        if (currentPageNumber === '<' && prevPageNumber === 1) {
-          currentPageNumber = prevPageNumber;
-          startArrayNumber = 0;
-          endArrayNumber = 5;
-        } else if (currentPageNumber === '>' && prevPageNumber === totoalPageLength) {
-          currentPageNumber = parseInt(prevPageNumber);
-          startArrayNumber = currentPageNumber * PAGE_LENGTH;
-          endArrayNumber = startArrayNumber + 5;
-          console.log('startArrayNumber: ' + startArrayNumber);
-        }
-
-        // 통상적인 페이지네이션
-        if (currentPageNumber === '<') {
-          currentPageNumber = prevPageNumber;
-          startArrayNumber = (currentPageNumber - 2) * PAGE_LENGTH;
-          endArrayNumber = startArrayNumber === 0 ? 5 : startArrayNumber * 2;
-          prevPageNumber -= 1;
-          console.log('startArrayNumber: ' + startArrayNumber);
-        } else if (currentPageNumber === '>') {
-          currentPageNumber = parseInt(prevPageNumber);
-          startArrayNumber = currentPageNumber * PAGE_LENGTH;
-          endArrayNumber = startArrayNumber + 5;
-          prevPageNumber = parseInt(prevPageNumber) + 1;
-          console.log('startArrayNumber: ' + startArrayNumber);
-        } else {
-          startArrayNumber = (currentPageNumber - 1) * PAGE_LENGTH;
-        }
-
-        console.log('endArrayNumber: ' + endArrayNumber);
-
-        const currentPageArray = todolist.slice(startArrayNumber, endArrayNumber);
-        console.log(currentPageArray);
-
-        const $ul = document.createElement('ul');
-        const $span_items = document.querySelectorAll('.item');
-        $listDiv.innerHTML = '';
-
-        for (const item of $span_items) {
-          item.classList.remove('currentPage');
-        }
-
-        // 현재 페이지 태그의 색상을 변경
-        $span_items[prevPageNumber - 1].classList.add('currentPage');
-
-        showTodosDisplay(currentPageArray, $ul);
-
-        $listDiv.append($ul);
-      };
-
-      const disiplayPagenation = () => {
-        // const $prev = document.createElement('span');
-        // const $next = document.createElement('span');
-        // $prev.id = 'prev';
-        // $next.id = 'next';
-        // $prev.innerHTML = '&lt;';
-        // $next.innerHTML = '&gt;';
-
-        // const $span_items = document.querySelectorAll('.item');
-        // $pagenationBar.innerHTML = '';
-        for (let i = 0; i < totoalPageLength; i++) {
-          const $span = document.createElement('span');
-          $span.textContent = i + 1;
-          $span.id = i + 1;
-          $span.className = 'item';
-          if (i === 0) {
-            $span.classList.add('currentPage');
-          }
-          $span.addEventListener('click', onClickPage);
-          $prev.before($span);
-        }
-        $prev.addEventListener('click', onClickPage);
-        $next.addEventListener('click', onClickPage);
-
-        $pagenationBar.prepend($prev);
-      };
-
-      disiplayPagenation();
     </script>
   </body>
 </html>
