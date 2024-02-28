@@ -11,10 +11,12 @@
     <main id="container">
       <div id="wrapper"></div>
     </main>
+    <div style="display: flex; justify-content: center"><button type="button">more</button></div>
     <footer></footer>
     <script>
       const $container = document.querySelector('#container');
       const $wrapper = document.querySelector('#wrapper');
+      const $button = document.querySelector('button');
 
       let pokemonBox = [];
 
@@ -41,25 +43,31 @@
       };
 
       function randomNumber() {
-        while (pokemonBox.length < 15) {
+        let i = 0;
+        while (i < 15) {
           let num = Math.floor(Math.random() * 500 + 1);
           // console.log(num);
 
           if (pokemonBox.indexOf(num) === -1) {
             pokemonBox.push(num);
+            i++;
           }
         }
       }
       randomNumber();
+      render(pokemonBox);
       // console.log(pokemonBox.sort((a, b) => a - b));
 
-      pokemonBox.forEach(pokemonID => {
-        getDataAPI(pokemonID);
-      });
+      function render(data) {
+        $wrapper.innerHTML = '';
+        data.forEach(pokemonID => {
+          getDataAPI(pokemonID);
+        });
+      }
 
-      setTimeout(() => {
-        $container.append($wrapper);
-      }, 1000);
+      // setTimeout(() => {
+      //   $container.append($wrapper);
+      // }, 5000);
 
       function getPokemonInfo(info, name) {
         // $container.innerHTML = '';
@@ -75,6 +83,12 @@
         $div.append($p);
         $wrapper.append($div);
       }
+
+      $button.addEventListener('click', () => {
+        console.log('click');
+        randomNumber();
+        render(pokemonBox);
+      });
     </script>
   </body>
 </html>

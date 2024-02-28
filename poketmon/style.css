@@ -1,6 +1,6 @@
 * {
   box-sizing: border-box;
-  margin: 0;
+  margin: 0 auto;
 }
 
 header {
@@ -13,14 +13,15 @@ header {
 }
 
 main {
-  height: 91vh;
-  margin: 0 1%;
+  /* height: 91vh; */
+  /* margin: 0 1%; */
 }
 
 #wrapper {
   display: grid;
-  grid-template-rows: 25% 25% 25% 25%;
-  grid-template-columns: 25% 25% 25% 25%;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  gap: 20px;
 }
 
 .item {
