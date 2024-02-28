@@ -8,12 +8,15 @@
   </head>
   <body>
     <header>포켓몬도감</header>
-    <main>
-      <div id="container"></div>
+    <main id="container">
+      <div id="wrapper"></div>
     </main>
     <footer></footer>
     <script>
       const $container = document.querySelector('#container');
+      const $wrapper = document.querySelector('#wrapper');
+
+      let pokemonBox = [];
 
       const getDataAPI = async id => {
         let url = `https://pokeapi.co/api/v2/pokemon/${id}`;
@@ -23,11 +26,13 @@
         let res = await fetch(url);
         let resKoreanName = await fetch(getKoreanNameURL);
 
+        // let response = Promise.allSettled([data, dataKoreanName]);
+
         if (res.ok) {
           let data = await res.json();
           let dataKoreanName = await resKoreanName.json();
+          // console.log(dataKoreanName.names[2].name);
           console.log(data);
-          console.log('한글이름:', dataKoreanName);
           getPokemonInfo(data, dataKoreanName);
         } else {
           console.log(res.status);
@@ -35,20 +40,40 @@
         }
       };
 
-      for (let i = 1; i <= 5; i++) {
-        getDataAPI(i);
+      function randomNumber() {
+        while (pokemonBox.length < 15) {
+          let num = Math.floor(Math.random() * 500 + 1);
+          // console.log(num);
+
+          if (pokemonBox.indexOf(num) === -1) {
+            pokemonBox.push(num);
+          }
+        }
       }
+      randomNumber();
+      // console.log(pokemonBox.sort((a, b) => a - b));
+
+      pokemonBox.forEach(pokemonID => {
+        getDataAPI(pokemonID);
+      });
+
+      setTimeout(() => {
+        $container.append($wrapper);
+      }, 1000);
 
       function getPokemonInfo(info, name) {
         // $container.innerHTML = '';
-        const wrapper = document.createElement('div');
-        const div = document.createElement('div');
+        const $div = document.createElement('div');
+        const $p = document.createElement('p');
         const img = document.createElement('img');
-        div.textContent = name.names[2].name;
+        $div.className = 'item';
+        $p.textContent = name.names[2].name;
         img.src = info.sprites.front_default;
-        wrapper.append(img);
-        wrapper.append(div);
-        $container.append(wrapper);
+        // 움짤
+        // img.src = info.sprites.other.showdown.front_default;
+        $div.append(img);
+        $div.append($p);
+        $wrapper.append($div);
       }
     </script>
   </body>

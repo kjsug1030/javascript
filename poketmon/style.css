@@ -17,6 +17,17 @@ main {
   margin: 0 1%;
 }
 
+#wrapper {
+  display: grid;
+  grid-template-rows: 25% 25% 25% 25%;
+  grid-template-columns: 25% 25% 25% 25%;
+}
+
+.item {
+  border: 1px solid green;
+  text-align: center;
+}
+
 footer {
   width: 100%;
   height: 4vh;
